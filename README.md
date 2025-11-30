@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Image Generator
 
-## Getting Started
+ Simple Next.js app that turns text prompts into images using OpenAI's image generation (`gpt-image-1`). The UI lets you enter a prompt, trigger generation, and view the returned image inline.
 
-First, run the development server:
+## Stack
+- Next.js App Router
+- React 19
+- OpenAI Node SDK for image generation
+- Tailwind CSS (Next 13+ built-in setup)
 
+## Prerequisites
+- Node.js 18+ and pnpm (or npm/yarn/bun)
+- An OpenAI API key with image generation access
+
+## Setup
+1) Install dependencies (pnpm preferred to match the lockfile):
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
+2) Add your OpenAI key:
+```bash
+cp .env.example .env  # if you keep an example file
+```
+Then set `OPENAI_API_KEY` in `.env`. Never commit real keys.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running
+- Dev server: `pnpm dev` then open http://localhost:3000
+- Build: `pnpm build`
+- Start (after build): `pnpm start`
+- Lint: `pnpm lint`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How it works
+- UI at `app/page.tsx` captures a text prompt and POSTs to `/api/generate`.
+- API route `app/api/generate/route.ts` calls OpenAI `gpt-image-1` with size `1024x1024`.
+- Response returns a base64 data URL, rendered directly in the page.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API
+`POST /api/generate`
+```json
+{ "prompt": "A cozy cabin in the woods at sunset" }
+```
+Response:
+```json
+{ "image": "data:image/png;base64,..." }
+```
+Returns 500 with `{ "error": "No image returned from OpenAI" }` if the model fails to respond.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+- Keep prompts short and descriptive for best results.
+- Add rate limiting/auth if you deploy this publicly to avoid key abuse.
